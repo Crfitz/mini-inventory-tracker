@@ -1,6 +1,8 @@
 from inv_classes import Inventory as inv
 import json
 
+# Not sure why this is uploading with 
+# double tabs...
 
 database = 'inventory_db.json'
 #inv_list = []
@@ -175,5 +177,6 @@ def print_formatted_list():
 	
 
 main_menu()
+
 
 
