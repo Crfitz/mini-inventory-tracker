@@ -1,9 +1,10 @@
 from inv_classes import Inventory as inv
 import json
 
+# all funcs included; have not moved to separate file yet
 database = 'inventory_db.json'
 #inv_list = []
-#prefilled list below just for testing
+#prefilled list just for testing
 inv_list = [
 	{'item':'bike', 'location':'carport', 'notes':'huffy mountain bike'},
 	{'item':'phone', 'location':'table'},
@@ -28,14 +29,12 @@ def main_menu():
 	top_menu = input("Choice: ")
 
 	if top_menu == '1':
-#		print("*** ADDING item ***\n")
 		add_node(item, location, note=None)
 	elif top_menu == '2':
 		remove_node(item)
 	elif top_menu == '3':
 		print("*** FIND item ***\n")
 	elif top_menu == '4':
-		print("*** UPDATE an entry ***\n")
 		update_node()
 	elif top_menu == '5':
 		print("*** SORT list ***\n")
@@ -92,7 +91,8 @@ def remove_node(item):
 	for node_item in inv_list:
 		if node_item['item'] == item:
 			print(f"Item '{item}' found!")
-			yn = input(f"Are you sure you want to delete '{item.upper()}'? ")
+			# verifying that user want to delete the chosen node
+			yn = input(f"Are you sure you want to permanently delete '{item.upper()}'? ")
 			if yn == 'y':
 				print(f"Removed item: '{item.upper()}'")
 				inv_list.remove(item)
@@ -103,34 +103,36 @@ def remove_node(item):
 			elif yn != 'y' and yn != 'n':
 				print("Invalid response")
 				continue
-			#elif yn == '*':
-#				print("Invalid response")
-#				continue
 		elif node_item != item:
 			print(f"Item '{item}' could not be found!")
 	main_menu()
 
 def quick_list():
+	#prints a quick list for item name reference (when updating at least)
 	print("Quick Listing: ")
 	for node_item in inv_list:
 		print(f"\t{node_item['item'].title()}")
 
 def update_node():
 	"""updating an entry node"""
+	print("*** UPDATE an entry ***\n")
 	quick_list()
 	item = input("Please enter item name: ")
 	item = item.lower()
 	
 	for node in inv_list:
 		if node['item'] == item:
-			print(f"Let's update {item.title()}!")
-			print(f"What would you like to update?")
-			print("1 - Item\n"
+			print(f"\nUpdating the '{item.upper()}' node")
+			print(f"What would you like to update? ")
+			print("1 - Item name\n"
 				"2 - Location\n"
 				"3 - Notes\n"
 				"4 - CANCEL\n"
+# add get() for notes, for the case where the node has no 'notes' field
+# or might just use an IF...
 				f"Currently: Item: {node['item']}; Location: {node['location']} ")
 			update = input("Choice: ")
+			# update item name; for misspelling or just a nme change
 			if update == '1':
 				old_info = node['item']
 				new_info = input("Enter new item name: ")
@@ -140,6 +142,7 @@ def update_node():
 						  f"To: '{new_info}'\n")
 				print(node)
 			elif update == '2':
+				# update location...
 				old_info = node['location']
 				new_info = input("Enter new location: ")
 				node['location'] = new_info.lower()
@@ -148,6 +151,7 @@ def update_node():
 						  f"To: '{new_info}'\n")
 				print(node)
 			elif update == '3':
+				# update or add notes if none
 				old_info = node['notes']
 				new_info = input("Enter new note: ")
 				node['notes'] = new_info.lower()
@@ -156,6 +160,7 @@ def update_node():
 						  f"To: '{new_info}'\n")
 				print(node)
 			elif update == '4':
+				# cancels with no changes
 				print("Update canceled")
 				break
 	main_menu()
@@ -174,6 +179,5 @@ def print_formatted_list():
 	
 
 main_menu()
-
 
 
