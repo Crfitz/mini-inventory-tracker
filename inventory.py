@@ -1,12 +1,9 @@
 from inv_classes import Inventory as inv
 import json
 
-# Not sure why this is uploading with 
-# double tabs...
-
 database = 'inventory_db.json'
 #inv_list = []
-#prefilled list just for testing
+#prefilled list below just for testing
 inv_list = [
 	{'item':'bike', 'location':'carport', 'notes':'huffy mountain bike'},
 	{'item':'phone', 'location':'table'},
