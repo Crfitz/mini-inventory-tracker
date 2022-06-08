@@ -1,23 +1,22 @@
 import inventory_functions as funcs
 import database_module as db
-#from inventory_functions import add_node
-import json
-import time
 
 database = 'inventory_db.json'
-version = '1.2'
+version = '1.32'
 
-#database = ' '
 data = ' '
 item = ' '
 location = ' '
 node = ' '
-print("Inventory Tracker\n"
+print("\nInventory Tracker\n"
 	  f"Version {version}\n")
 print("Fitzie Enterprises, LLC.\n"
 "Copyright 2022; All rights reserved\n")
 
-current_time = time.ctime()
+db.db_check()
+
+print("Enter 'h' for HELP")
+print("Enter 'q' to QUIT")
 
 """
 username = ' '
@@ -31,9 +30,6 @@ def db_create_load(username):
 db_create_load(username)
 print(f"{database}")
 """
-
-
-db.db_check()
 
 funcs.main_menu()
 

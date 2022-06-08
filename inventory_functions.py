@@ -1,12 +1,19 @@
+## inventory_functions.py ##
 # for main program: inventory_tracker.py
+import sys
 import database_module as db
-import time
+import datetime
+import export as ex
 
+version = '1.32'
 data = ' '
 item = ' '
 location = ' '
+note = ' '
 node = ' '
-current_time = time.ctime()
+x = ' '
+current_time = datetime.date.today()
+
 
 def main_menu():
 	print("\nPlease choose an option below")
@@ -17,10 +24,15 @@ def main_menu():
 	"5 - Sort items\n"
 	"6 - Print quick list\n"
 	"7 - Print formatted list\n"
-	"8 - Search by Tag (beta)\n")
+	"8 - Search by Tag (beta)\n"
+	"9 - Export to CSV/Excel file\n")
 	top_menu = input("Choice: ")
 
-	if top_menu == '1':
+	if top_menu == 'h':
+		help()
+	elif top_menu == 'q':
+		sys.exit("Exiting Inventory Tracker...")
+	elif top_menu == '1':
 		add_node(item, location, note=None)
 	elif top_menu == '2':
 		remove_node(item)
@@ -36,8 +48,12 @@ def main_menu():
 	elif top_menu == '7':
 		print_formatted_list()
 	elif top_menu == '8':
-		print("\nFEATURE COMING SOON!\n"
-			  "'Search by Tag'")
+		print("\nIn beta\n"
+			"FEATURE COMING SOON!\n"
+			"'Search by Tag'")
+	elif top_menu == '9':
+		print("\n*** Export to CSV/Excel file ***\n")
+		ex.exportdb(x)
 		main_menu()
 
 
@@ -45,6 +61,7 @@ def add_node(item, location, note=None):
     """adds nodes to main inventory list, until user enters 'q' to quit."""
     inv_list = db.read()
     new_node = {}
+    tags = []
     num = 0
     print("\n*** ADDING item ***\n")
     while True:
@@ -52,28 +69,30 @@ def add_node(item, location, note=None):
         print("(Enter 'q' at anytime to quit)")
 
         item = input("Item: ")
-        item = item.lower()
-        check_item_num = item
+        item = item.lower().strip()
+        item = item.strip()
         if item == 'q':
             print("Exiting...\n")
             break
         for node in inv_list:
+            active_add = True
             check_list = node['item']
             check_list = check_list.lower()
             # checks list for identical name, alerts user, stops entry process.
-            # currently broken, 05.18.22
             if item == check_list:
-                print(f"\nItem '{item.upper()}' already in list!\n"
-                      "Please try again")
+                print(f"\nItem '{item.upper()}' already in list!")
+                print("Please try again")
+                active_add = False
                 break
-                main_menu()
+        if not active_add:
+        	break
         location = input("Location: ")
         if location == 'q':
             print("Item NOT ADDED")
             print("Exiting...\n")
             break
         note = input("Note (optional): ")
-        new_node = {'created': current_time, 'item': item, 'location': location.lower()}
+        new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower()}
         if note:
             new_node['note'] = note.lower()
             if note == 'q':
@@ -82,10 +101,26 @@ def add_node(item, location, note=None):
                 break
         elif note not in new_node:
             new_node['note'] = 'none'
+        print("Tags (optional): ")
+        print("\tPress Enter skip (no tag)")
+        print("\tEnter one tag at a time")
+        print("\tEnter 'n' to finish")
+        new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(), 'note': note.lower(), 'tags': []}
+        while True:
+        	tags = input("Tags (optional): ")
+        	if tags == 'f' or tags == 'q':
+        		break
+        	elif tags == '':
+        		tags = 'none'
+        		new_node['tags'].append(tags.lower())
+        		break
+        	else:
+        		tags = tags.strip()
+        		new_node['tags'].append(tags.lower())
+        		continue
         inv_list.append(new_node)
     print("---------------------")
     for key, value in new_node.items():
-        #		for key, value in new_node.items():
         print(f"{key.title()}: {value}")
     db.write(inv_list)
     # returning to main menu
@@ -97,9 +132,8 @@ def remove_node(item):
     inv_list = db.read()
     print("\n*** REMOVING item ***")
     item = input("Enter item: ")
+    item = item.strip()
     found = 0
-    # add while loop; for in the case that two item have the same name and you need to remove the second instance.
-    # currently, selecting 'no' to removing the first item returns the user to the main menu instead of asking about the second item.
     qty_found = 0
     for node in inv_list:
         check_list = node['item']
@@ -107,18 +141,15 @@ def remove_node(item):
             found = 1
             qty_found += 1
             print(f"\nItem '{item.upper()}' found!\n")
-            print(f"INSTANCE {qty_found}")
             for key, value in node.items():
                 print(f"\t{key.title()}: {value}")
 
-            yn = input(f"Are you sure you want to permanently delete '{item.upper()}', INSTANCE {qty_found}? (y/n) ")
+            yn = input(f"Are you sure you want to permanently delete '{item.upper()}'? (y/n) ")
             if yn == 'y':
                 print(f"Removed item: '{item.upper()}'")
                 inv_list.remove(node)
                 db.write(inv_list)
             elif yn == 'n':
-                #				if qty_found > 1:
-
                 print("\nCanceling item removal")
                 db.write(inv_list)
                 break
@@ -132,30 +163,24 @@ def remove_node(item):
 
 
 def find_item():
-    """A simple search func that displays entire entry (dict) for the specified item"""
-    """Trying to change func so that it can search all values with even a partial value 05.19.2022"""
+    """A simple search func that displays entire entry (dict) for the specified item; can search all values with even a partial search term"""
     print("*** FIND an entry ***\n")
     inv_list = db.read()
     item = input("Please enter item name: ")
+    print()
     item = item.lower()
+    item = item.strip()
     item_found = 0
+    #searches for the search term in each value in each node (list element)
     for node in inv_list:
         for k, v in node.items():
-            #			for value in node[key]:
             if item in v:
                 print("Yes it's in the list!")
-                #				print(node)
                 for key, value in node.items():
                     print(f"{key.title()}: {value.upper()}")
-
-                #		if item in node.values():
-                #		if node['item'] == item:
-
-                # for key, value in node.items():
-                #				print(f"{key.title()}: {value.upper()}")
                 item_found = 1
-                print("* END *")
-        # returning to main menu
+                print("* * * * * * END * * * * * *\n")
+    # returning to main menu
     main_menu()
     if item_found == 0:
         print(f"Item '{item.upper()}' not found.")
@@ -185,51 +210,82 @@ def update_node():
     quick_list()
     item = input("Please enter item name: ")
     item = item.lower()
-
+    item = item.strip()
     for node in inv_list:
         if node['item'] == item:
             print(f"\nUpdating the '{item.upper()}' node")
-            print(f"  Current data:\n"
-                  f"\tItem: {node['item']}\n"
-                  f"\tLocation: {node['location']}\n"
-                  f"\tNotes: {node['note']}\n")
-            print(f"What would you like to update? ")
+            print("Current data:\n")
+            for key, value in node.items():
+            	print(f"\t{key.title()}: {value}")
+            print()
+            print("What would you like to update? ")
             print("1 - Item name\n"
                   "2 - Location\n"
                   "3 - Notes\n"
-                  "4 - CANCEL\n")
+                  "4 - Tags\n"
+                  "5 - CANCEL\n")
             update = input("Choice: ")
             # update item name; for misspelling or just some updating some info
             if update == '1':
                 old_info = node['item']
                 new_info = input("Enter new item name: ")
-                node['modified'] = current_time
+                node['modified'] = current_time.strftime("%Y-%m-%d")
                 node['item'] = new_info.lower()
                 print(f"\nChanged 'item' field of '{item.upper()}' node\n"
-                      f"From: '{old_info}'\n"
-                      f"To: '{new_info}'\n")
-            #				print(node)
+                f"From: '{old_info}'\n"
+                f"To: '{new_info}'\n")
+                for key, value in node.items():
+                	print(f"\t{key.title()}: {value}")
             elif update == '2':
                 # update location...
                 old_info = node['location']
                 new_info = input("Enter new location: ")
-                node['modified'] = current_time
+                #adds a new key - timestamp for 'modified'; doesn't replace or update 'created' timestamp
+                node['modified'] = current_time.strftime("%Y-%m-%d")
                 node['location'] = new_info.lower()
                 print(f"\nChanged 'Location' field of '{item.upper()}' node\n"
-                      f"From: '{old_info}'\n"
-                      f"To: '{new_info}'\n")
-                print(node)
+                f"From: '{old_info}'\n"
+                f"To: '{new_info}'\n")
+                for key, value in node.items():
+                	print(f"\t{key.title()}: {value}")
             elif update == '3':
                 # update or add notes if none
                 old_info = node.get('note', 'none')
                 new_info = input("Enter new note: ")
-                node['modified'] = current_time
+                node['modified'] = current_time.strftime("%Y-%m-%d")
                 node['note'] = new_info.lower()
                 print(f"\nChanged 'Note' field of '{item.upper()}' node\n"
-                      f"From: '{old_info}'\n"
-                      f"To: '{new_info}'\n")
-                print(node)
+                f"From: '{old_info}'\n"
+                f"To: '{new_info}'\n")
+                for key, value in node.items():
+                	print(f"\t{key.title()}: {value}")
             elif update == '4':
+            	#adding or updating tags
+            	print("This option is in the works...")
+            	print("Tags: ")
+            	print("\tEnter one tag at a time")
+            	print("\tEnter 'n' to finish")
+            	new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(), 'note': note.lower(), 'tags': []}
+            	old_info = node.get('tags', 'none')
+            	node['modified'] = current_time.strftime("%Y-%m-%d")
+            	while True:
+            		tags = input("Tags (optional): ")
+            		if tags == 'n' or tags == 'q':
+            			break
+            		elif tags == '':
+            			tags = 'none'
+            			new_node['tags'].append(tags.lower())
+            			break
+            		else:
+            			tags = tags.strip()
+            			new_node['tags'].append(tags.lower())
+            			continue
+            	print(f"\nChanged 'Tags' field of '{item.upper()}' node\n")
+            	print(f"From: '{old_info}'\n")
+            	print(f"To: '{tags}'\n")
+            	for key, value in node.items():
+                	print(f"\t{key.title()}: {value}")
+            elif update == '5':
                 # cancels with no changes
                 print("Update canceled")
                 break
@@ -268,7 +324,7 @@ def sort_list():
 	elif choice == 3:
 		print("\nSorting by Notes field\n")
 		sorter = 'note'
-	print(f"{current_time}\n")
+	print(f"{current_time.strftime('%Y-%m-%d')}\n")
 	sorted_inv_list = sorted(inv_list, key=lambda d: d[sorter])
 	#printing out sorted, numbered list, based on user's criteria
 	for node in sorted_inv_list:
@@ -281,10 +337,11 @@ def sort_list():
 
 
 def quick_list():
-	"""prints a quick list for item name reference (when updating at least)"""
+	"""prints a quick list for item name reference (item only)"""
 	print("Quick Listing: ")
 	inv_list = db.read()
-	for node_item in inv_list:
+	sorted_inv_list = sorted(inv_list, key=lambda d: d['item'])
+	for node_item in sorted_inv_list:
 		print(f"\t{node_item['item'].title()}")
 
 
@@ -293,12 +350,39 @@ def print_formatted_list():
     inv_list = db.read()
     num = 1
     print("\n*** Inventory List ***\n"
-          f"{current_time}\n")
-    for node in inv_list:
+          f"{current_time.strftime('%Y-%m-%d')}\n")
+    sorted_inv_list = sorted(inv_list, key=lambda d: d['item'])
+    for node in sorted_inv_list:
         print(f"{num} - - - - - - - - - - - - - - - - - ")
         for key, value in node.items():
             print(f"\t{key.title()}: {value}")
         num += 1
     # returning to main menu
     main_menu()
-
+	
+	
+def help():
+	print(f"\nInventory Tracker v{version}")
+	print("Help Section\n")
+	print("\th - Displays this help section")
+	print("\tq - quit")
+	print("\t\tEntering 'q' while in the Main Menu EXITS the program.")
+	print("\t\tEntering 'q' while in the Add Item section cancels the add and returns you to the Main Menu.\n")
+	print("* All inputs are case-insensitive\n")
+	print("\tAdding Item:\n"
+	"\t\tEnter ITEM, LOCATION. Notes and Tags are optional (press Enter to skip). \n")
+	print("\tRemoving Item:\n"
+	"\t\tEnter ITEM to be removed.  Enter y(es) or n(o) at confirmtion.\n")
+	print("\tFind Item: \n"
+	"\t\tEnter a search term, full or partial. This will search the entire list and every section of each node.\n")
+	print("\tUpdate Item: \n"
+	"\t\tEnter the item and then at the next prompt, choose which part of the node you want to update, e.g., Item or Location. You may still cancel at this point. After updating, a 'modified' date/timestamp will be added to the node.\n")
+	print("\tSort item: \n"
+	"\t\tChoose a sort-by option and the entire list will be sorted alphabetically by said option.\n")
+	print("\tQuick list: \n"
+	"\t\tPrints to screen a simple list of item names only.\n")
+	print("\tPrint formatted list: \n"
+	"\t\tPrints to screen a formatted, sorted and numbered list with all of the data of each node.\n")
+	print("\tExport to CSV/Excel format: \n")
+	print("\t\tExports entire inventory list to a CSV / Excel spreadsheet format for saving or printing to hardcopy.\n")
+	main_menu()
