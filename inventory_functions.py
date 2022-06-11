@@ -96,33 +96,42 @@ def add_node(item, location, note=None):
         if note:
             new_node['note'] = note.lower()
             if note == 'q':
-                print("Item NOT ADDED")
+                print("\nItem NOT ADDED")
                 print("Exiting...\n")
                 break
-        elif note not in new_node:
-            new_node['note'] = 'none'
+        elif note == '':
+            note = 'none'
+            new_node['note'] = note
         print("Tags (optional): ")
         print("\tPress Enter skip (no tag)")
         print("\tEnter one tag at a time")
-        print("\tEnter 'n' to finish")
+        print("\tEnter 'f' to finish")
         new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(), 'note': note.lower(), 'tags': []}
         while True:
         	tags = input("Tags (optional): ")
-        	if tags == 'f' or tags == 'q':
+        	# f to finish adding tags and write node to list in db
+        	# q to quit and cancel addition; last chance to cancel
+        	if tags == 'f':
+        		break
+        	elif tags == 'q':
         		break
         	elif tags == '':
-        		tags = 'none'
-        		new_node['tags'].append(tags.lower())
+        		new_node['tags'].append('none')
         		break
         	else:
         		tags = tags.strip()
         		new_node['tags'].append(tags.lower())
         		continue
-        inv_list.append(new_node)
-    print("---------------------")
-    for key, value in new_node.items():
-        print(f"{key.title()}: {value}")
-    db.write(inv_list)
+        if tags == 'q':
+        	print("\nItem NOT ADDED")
+        	print("Exiting...\n")
+        	break
+        else:
+        	inv_list.append(new_node)
+        	print("---------------------")
+        	for key, value in new_node.items():
+        		print(f"{key.title()}: {value}")
+        	db.write(inv_list)
     # returning to main menu
     main_menu()
 
@@ -134,12 +143,12 @@ def remove_node(item):
     item = input("Enter item: ")
     item = item.strip()
     found = 0
-    qty_found = 0
+    #qty_found = 0
     for node in inv_list:
         check_list = node['item']
         if item.lower() == check_list.lower():
             found = 1
-            qty_found += 1
+            #qty_found += 1
             print(f"\nItem '{item.upper()}' found!\n")
             for key, value in node.items():
                 print(f"\t{key.title()}: {value}")
@@ -151,7 +160,7 @@ def remove_node(item):
                 db.write(inv_list)
             elif yn == 'n':
                 print("\nCanceling item removal")
-                db.write(inv_list)
+                #db.write(inv_list)
                 break
             elif yn != 'y' and yn != 'n':
                 print("Invalid response")
