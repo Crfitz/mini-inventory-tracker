@@ -4,6 +4,7 @@ import sys
 import database_module as db
 import datetime
 import export as ex
+from difflib import get_close_matches
 
 version = '1.32'
 data = ' '
@@ -111,6 +112,7 @@ def add_node(item, location, note=None):
         	tags = input("Tags (optional): ")
         	# f to finish adding tags and write node to list in db
         	# q to quit and cancel addition; last chance to cancel
+        	# adds tags, one at a time, until user enters 'f' to finish, completing the addition process, writing to database
         	if tags == 'f':
         		break
         	elif tags == 'q':
@@ -128,6 +130,7 @@ def add_node(item, location, note=None):
         	break
         else:
         	inv_list.append(new_node)
+        	# prints to screen node being added
         	print("---------------------")
         	for key, value in new_node.items():
         		print(f"{key.title()}: {value}")
@@ -152,8 +155,9 @@ def remove_node(item):
             print(f"\nItem '{item.upper()}' found!\n")
             for key, value in node.items():
                 print(f"\t{key.title()}: {value}")
-
+			# deletion confirmation
             yn = input(f"Are you sure you want to permanently delete '{item.upper()}'? (y/n) ")
+            yn = yn.lower()
             if yn == 'y':
                 print(f"Removed item: '{item.upper()}'")
                 inv_list.remove(node)
