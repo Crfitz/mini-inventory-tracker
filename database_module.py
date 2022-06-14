@@ -1,6 +1,8 @@
 # main program: inventory_tracker.py
 # this module handles the database;
 # checking for db file, creates one if none found, reads and writes to file
+# 06.13.2022
+
 import json
 import csv
 import ast
@@ -35,20 +37,3 @@ def read():
 	with open(database, 'r') as db:
 		data = json.load(db)
 	return data
-
-
-def export(x):
-	"""exports inventory to a csv file"""
-	header = ['created', 'item', 'location', 'note', 'tags', 'modified']
-	new_dict = x
-	print(f"New_dict: {new_dict}")
-	print(f"x = {new_dict}")
-	new_path = open("test_invlist3.csv", "w")
-	new_dict = read()
-	z = csv.writer(new_path)
-	z.writerow(header)
-	for node in new_dict:
-		values = node.values()
-		z.writerow(values) 
-	new_path.close()
-

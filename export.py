@@ -1,3 +1,6 @@
+# for main program: inventory_tracker.py
+# 06.13.2022
+
 import csv
 import database_module as db
 import ast

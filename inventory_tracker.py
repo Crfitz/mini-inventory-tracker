@@ -1,3 +1,5 @@
+# main program
+# 06.13.2022
 import inventory_functions as funcs
 import database_module as db
 
