@@ -1,6 +1,5 @@
 ## inventory_functions.py ##
 # for main program: inventory_tracker.py
-# 06.13.2022
 import sys
 import database_module as db
 import datetime
@@ -18,45 +17,45 @@ current_time = datetime.date.today()
 
 
 def main_menu():
-    print("\nPlease choose an option below")
-    print("1 - Add item\n"
-          "2 - Remove item\n"
-          "3 - Find item\n"
-          "4 - Update an entry\n"
-          "5 - Sort items\n"
-          "6 - Print quick list\n"
-          "7 - Print formatted list\n"
-          "8 - Search by Tag (beta)\n"
-          "9 - Export to CSV/Excel file\n")
-    top_menu = input("Choice: ")
+	print("\nPlease choose an option below")
+	print("1 - Add item\n"
+	"2 - Remove item\n"
+	"3 - Find item\n"
+	"4 - Update an entry\n"
+	"5 - Sort items\n"
+	"6 - Print quick list\n"
+	"7 - Print formatted list\n"
+	"8 - Search by Tag (beta)\n"
+	"9 - Export to CSV/Excel file\n")
+	top_menu = input("Choice: ")
 
-    if top_menu == 'h':
-        help()
-    elif top_menu == 'q':
-        sys.exit("Exiting Inventory Tracker...")
-    elif top_menu == '1':
-        add_node(item, location, note=None)
-    elif top_menu == '2':
-        remove_node(item)
-    elif top_menu == '3':
-        find_item()
-    elif top_menu == '4':
-        update_node()
-    elif top_menu == '5':
-        sort_list()
-    elif top_menu == '6':
-        quick_list()
-        main_menu()
-    elif top_menu == '7':
-        print_formatted_list()
-    elif top_menu == '8':
-        print("\nIn beta\n"
-              "FEATURE COMING SOON!\n"
-              "'Search by Tag'")
-    elif top_menu == '9':
-        print("\n*** Export to CSV/Excel file ***\n")
-        ex.exportdb(x)
-        main_menu()
+	if top_menu == 'h':
+		help()
+	elif top_menu == 'q':
+		sys.exit("Exiting Inventory Tracker...")
+	elif top_menu == '1':
+		add_node(item, location, note=None)
+	elif top_menu == '2':
+		remove_node(item)
+	elif top_menu == '3':
+		find_item()
+	elif top_menu == '4':
+		update_node()
+	elif top_menu == '5':
+		sort_list()
+	elif top_menu == '6':
+		quick_list()
+		main_menu()
+	elif top_menu == '7':
+		print_formatted_list()
+	elif top_menu == '8':
+		print("\nIn beta\n"
+			"FEATURE COMING SOON!\n"
+			"'Search by Tag'")
+	elif top_menu == '9':
+		print("\n*** Export to CSV/Excel file ***\n")
+		ex.exportdb(x)
+		main_menu()
 
 
 def add_node(item, location, note=None):
@@ -65,7 +64,6 @@ def add_node(item, location, note=None):
     new_node = {}
     tags = []
     num = 0
-    active_add = ''
     print("\n*** ADDING item ***\n")
     while True:
         print("Enter an item")
@@ -87,8 +85,8 @@ def add_node(item, location, note=None):
                 print("Please try again")
                 active_add = False
                 break
-        if active_add == False:
-            break
+        if not active_add:
+        	break
         location = input("Location: ")
         if location == 'q':
             print("Item NOT ADDED")
@@ -109,35 +107,34 @@ def add_node(item, location, note=None):
         print("\tPress Enter skip (no tag)")
         print("\tEnter one tag at a time")
         print("\tEnter 'f' to finish")
-        new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(),
-                    'note': note.lower(), 'tags': []}
+        new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(), 'note': note.lower(), 'tags': []}
         while True:
-            tags = input("Tags (optional): ")
-            # f to finish adding tags and write node to list in db
-            # q to quit and cancel addition; last chance to cancel
-            # adds tags, one at a time, until user enters 'f' to finish, completing the addition process, writing to database
-            if tags == 'f':
-                break
-            elif tags == 'q':
-                break
-            elif tags == '':
-                new_node['tags'].append('none')
-                break
-            else:
-                tags = tags.strip()
-                new_node['tags'].append(tags.lower())
-                continue
+        	tags = input("Tags (optional): ")
+        	# f to finish adding tags and write node to list in db
+        	# q to quit and cancel addition; last chance to cancel
+        	# adds tags, one at a time, until user enters 'f' to finish, completing the addition process, writing to database
+        	if tags == 'f':
+        		break
+        	elif tags == 'q':
+        		break
+        	elif tags == '':
+        		new_node['tags'].append('none')
+        		break
+        	else:
+        		tags = tags.strip()
+        		new_node['tags'].append(tags.lower())
+        		continue
         if tags == 'q':
-            print("\nItem NOT ADDED")
-            print("Exiting...\n")
-            break
+        	print("\nItem NOT ADDED")
+        	print("Exiting...\n")
+        	break
         else:
-            inv_list.append(new_node)
-            # prints to screen node being added
-            print("---------------------")
-            for key, value in new_node.items():
-                print(f"{key.title()}: {value}")
-            db.write(inv_list)
+        	inv_list.append(new_node)
+        	# prints to screen node being added
+        	print("---------------------")
+        	for key, value in new_node.items():
+        		print(f"{key.title()}: {value}")
+        	db.write(inv_list)
     # returning to main menu
     main_menu()
 
@@ -149,16 +146,16 @@ def remove_node(item):
     item = input("Enter item: ")
     item = item.strip()
     found = 0
-    # qty_found = 0
+    #qty_found = 0
     for node in inv_list:
         check_list = node['item']
         if item.lower() == check_list.lower():
             found = 1
-            # qty_found += 1
+            #qty_found += 1
             print(f"\nItem '{item.upper()}' found!\n")
             for key, value in node.items():
                 print(f"\t{key.title()}: {value}")
-            # deletion confirmation
+			# deletion confirmation
             yn = input(f"Are you sure you want to permanently delete '{item.upper()}'? (y/n) ")
             yn = yn.lower()
             if yn == 'y':
@@ -167,7 +164,7 @@ def remove_node(item):
                 db.write(inv_list)
             elif yn == 'n':
                 print("\nCanceling item removal")
-                # db.write(inv_list)
+                #db.write(inv_list)
                 break
             elif yn != 'y' and yn != 'n':
                 print("Invalid response")
@@ -187,7 +184,7 @@ def find_item():
     item = item.lower()
     item = item.strip()
     item_found = 0
-    # searches for the search term in each value in each node (list element)
+    #searches for the search term in each value in each node (list element)
     for node in inv_list:
         for k, v in node.items():
             if item in v:
@@ -232,7 +229,7 @@ def update_node():
             print(f"\nUpdating the '{item.upper()}' node")
             print("Current data:\n")
             for key, value in node.items():
-                print(f"\t{key.title()}: {value}")
+            	print(f"\t{key.title()}: {value}")
             print()
             print("What would you like to update? ")
             print("1 - Item name\n"
@@ -248,22 +245,22 @@ def update_node():
                 node['modified'] = current_time.strftime("%Y-%m-%d")
                 node['item'] = new_info.lower()
                 print(f"\nChanged 'item' field of '{item.upper()}' node\n"
-                      f"From: '{old_info}'\n"
-                      f"To: '{new_info}'\n")
+                f"From: '{old_info}'\n"
+                f"To: '{new_info}'\n")
                 for key, value in node.items():
-                    print(f"\t{key.title()}: {value}")
+                	print(f"\t{key.title()}: {value}")
             elif update == '2':
                 # update location...
                 old_info = node['location']
                 new_info = input("Enter new location: ")
-                # adds a new key - timestamp for 'modified'; doesn't replace or update 'created' timestamp
+                #adds a new key - timestamp for 'modified'; doesn't replace or update 'created' timestamp
                 node['modified'] = current_time.strftime("%Y-%m-%d")
                 node['location'] = new_info.lower()
                 print(f"\nChanged 'Location' field of '{item.upper()}' node\n"
-                      f"From: '{old_info}'\n"
-                      f"To: '{new_info}'\n")
+                f"From: '{old_info}'\n"
+                f"To: '{new_info}'\n")
                 for key, value in node.items():
-                    print(f"\t{key.title()}: {value}")
+                	print(f"\t{key.title()}: {value}")
             elif update == '3':
                 # update or add notes if none
                 old_info = node.get('note', 'none')
@@ -271,37 +268,36 @@ def update_node():
                 node['modified'] = current_time.strftime("%Y-%m-%d")
                 node['note'] = new_info.lower()
                 print(f"\nChanged 'Note' field of '{item.upper()}' node\n"
-                      f"From: '{old_info}'\n"
-                      f"To: '{new_info}'\n")
+                f"From: '{old_info}'\n"
+                f"To: '{new_info}'\n")
                 for key, value in node.items():
-                    print(f"\t{key.title()}: {value}")
+                	print(f"\t{key.title()}: {value}")
             elif update == '4':
-                # adding or updating tags
-                print("This option is in the works...")
-                print("Tags: ")
-                print("\tEnter one tag at a time")
-                print("\tEnter 'n' to finish")
-                new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(),
-                            'note': note.lower(), 'tags': []}
-                old_info = node.get('tags', 'none')
-                node['modified'] = current_time.strftime("%Y-%m-%d")
-                while True:
-                    tags = input("Tags (optional): ")
-                    if tags == 'n' or tags == 'q':
-                        break
-                    elif tags == '':
-                        tags = 'none'
-                        new_node['tags'].append(tags.lower())
-                        break
-                    else:
-                        tags = tags.strip()
-                        new_node['tags'].append(tags.lower())
-                        continue
-                print(f"\nChanged 'Tags' field of '{item.upper()}' node\n")
-                print(f"From: '{old_info}'\n")
-                print(f"To: '{tags}'\n")
-                for key, value in node.items():
-                    print(f"\t{key.title()}: {value}")
+            	#adding or updating tags
+            	print("This option is in the works...")
+            	print("Tags: ")
+            	print("\tEnter one tag at a time")
+            	print("\tEnter 'f' to finish")
+            	new_node = {'created': current_time.strftime("%Y-%m-%d"), 'item': item, 'location': location.lower(), 'note': note.lower(), 'tags': []}
+            	old_info = node.get('tags', 'none')
+            	node['modified'] = current_time.strftime("%Y-%m-%d")
+            	while True:
+            		tags = input("Tags (optional): ")
+            		if tags == 'f' or tags == 'q':
+            			break
+            		elif tags == '':
+            			tags = 'none'
+            			new_node['tags'].append(tags.lower())
+            			break
+            		else:
+            			tags = tags.strip()
+            			new_node['tags'].append(tags.lower())
+            			continue
+            	print(f"\nChanged 'Tags' field of '{item.upper()}' node\n")
+            	print(f"From: '{old_info}'\n")
+            	print(f"To: '{tags}'\n")
+            	for key, value in node.items():
+                	print(f"\t{key.title()}: {value}")
             elif update == '5':
                 # cancels with no changes
                 print("Update canceled")
@@ -312,55 +308,54 @@ def update_node():
 
 
 def sort_by():
-    """Choose by which key to sort the inventory list; to be used with sort_list function"""
-    inv_list = db.read()
-    print("Sort by:\n"
-          "1 - Item name\n"
-          "2 - Location name\n"
-          "3 - Notes\n")
-    choice = input("Choice: ")
-    if choice == '1':
-        return 1
-    elif choice == '2':
-        return 2
-    elif choice == '3':
-        return 3
-
+	"""Choose by which key to sort the inventory list; to be used with sort_list function"""
+	inv_list = db.read()
+	print("Sort by:\n"
+		  "1 - Item name\n"
+		  "2 - Location name\n"
+		  "3 - Notes\n")
+	choice = input("Choice: ")
+	if choice == '1':
+		return 1
+	elif choice == '2':
+		return 2
+	elif choice == '3':
+		return 3
 
 def sort_list():
-    """Prints to screen the inventory list, sorted by Item or Location"""
-    inv_list = db.read()
-    num = 1
-    print("\n*** Sorted Inventory List ***\n")
-    choice = sort_by()
-    if choice == 1:
-        print("\nSorting by Item Name\n")
-        sorter = 'item'
-    elif choice == 2:
-        print("\nSorting by Location Name\n")
-        sorter = 'location'
-    elif choice == 3:
-        print("\nSorting by Notes field\n")
-        sorter = 'note'
-    print(f"{current_time.strftime('%Y-%m-%d')}\n")
-    sorted_inv_list = sorted(inv_list, key=lambda d: d[sorter])
-    # printing out sorted, numbered list, based on user's criteria
-    for node in sorted_inv_list:
-        print(f"{num} - - - - - - - - - - - - - - - - - ")
-        for key, value in node.items():
-            print(f"\t{key.title()}: {value}")
-        num += 1
-    # returning to main menu
-    main_menu()
+	"""Prints to screen the inventory list, sorted by Item or Location"""
+	inv_list = db.read()
+	num = 1
+	print("\n*** Sorted Inventory List ***\n")
+	choice = sort_by()
+	if choice == 1:
+		print("\nSorting by Item Name\n")
+		sorter = 'item'
+	elif choice == 2:
+		print("\nSorting by Location Name\n")
+		sorter = 'location'
+	elif choice == 3:
+		print("\nSorting by Notes field\n")
+		sorter = 'note'
+	print(f"{current_time.strftime('%Y-%m-%d')}\n")
+	sorted_inv_list = sorted(inv_list, key=lambda d: d[sorter])
+	#printing out sorted, numbered list, based on user's criteria
+	for node in sorted_inv_list:
+		print(f"{num} - - - - - - - - - - - - - - - - - ")
+		for key, value in node.items():
+			print(f"\t{key.title()}: {value}")
+		num += 1
+	# returning to main menu
+	main_menu()
 
 
 def quick_list():
-    """prints a quick list for item name reference (item only)"""
-    print("Quick Listing: ")
-    inv_list = db.read()
-    sorted_inv_list = sorted(inv_list, key=lambda d: d['item'])
-    for node_item in sorted_inv_list:
-        print(f"\t{node_item['item'].title()}")
+	"""prints a quick list for item name reference (item only)"""
+	print("Quick Listing: ")
+	inv_list = db.read()
+	sorted_inv_list = sorted(inv_list, key=lambda d: d['item'])
+	for node_item in sorted_inv_list:
+		print(f"\t{node_item['item'].title()}")
 
 
 def print_formatted_list():
@@ -377,30 +372,30 @@ def print_formatted_list():
         num += 1
     # returning to main menu
     main_menu()
-
-
+	
+	
 def help():
-    print(f"\nInventory Tracker v{version}")
-    print("Help Section\n")
-    print("\th - Displays this help section")
-    print("\tq - quit")
-    print("\t\tEntering 'q' while in the Main Menu EXITS the program.")
-    print("\t\tEntering 'q' while in the Add Item section cancels the add and returns you to the Main Menu.\n")
-    print("* All inputs are case-insensitive\n")
-    print("\tAdding Item:\n"
-          "\t\tEnter ITEM, LOCATION. Notes and Tags are optional (press Enter to skip). \n")
-    print("\tRemoving Item:\n"
-          "\t\tEnter ITEM to be removed.  Enter y(es) or n(o) at confirmtion.\n")
-    print("\tFind Item: \n"
-          "\t\tEnter a search term, full or partial. This will search the entire list and every section of each node.\n")
-    print("\tUpdate Item: \n"
-          "\t\tEnter the item and then at the next prompt, choose which part of the node you want to update, e.g., Item or Location. You may still cancel at this point. After updating, a 'modified' date/timestamp will be added to the node.\n")
-    print("\tSort item: \n"
-          "\t\tChoose a sort-by option and the entire list will be sorted alphabetically by said option.\n")
-    print("\tQuick list: \n"
-          "\t\tPrints to screen a simple list of item names only.\n")
-    print("\tPrint formatted list: \n"
-          "\t\tPrints to screen a formatted, sorted and numbered list with all of the data of each node.\n")
-    print("\tExport to CSV/Excel format: \n")
-    print("\t\tExports entire inventory list to a CSV / Excel spreadsheet format for saving or printing to hardcopy.\n")
-    main_menu()
+	print(f"\nInventory Tracker v{version}")
+	print("Help Section\n")
+	print("\th - Displays this help section")
+	print("\tq - quit")
+	print("\t\tEntering 'q' while in the Main Menu EXITS the program.")
+	print("\t\tEntering 'q' while in the Add Item section cancels the add and returns you to the Main Menu.\n")
+	print("* All inputs are case-insensitive\n")
+	print("\tAdding Item:\n"
+	"\t\tEnter ITEM, LOCATION. Notes and Tags are optional (press Enter to skip). \n")
+	print("\tRemoving Item:\n"
+	"\t\tEnter ITEM to be removed.  Enter y(es) or n(o) at confirmtion.\n")
+	print("\tFind Item: \n"
+	"\t\tEnter a search term, full or partial. This will search the entire list and every section of each node.\n")
+	print("\tUpdate Item: \n"
+	"\t\tEnter the item and then at the next prompt, choose which part of the node you want to update, e.g., Item or Location. You may still cancel at this point. After updating, a 'modified' date/timestamp will be added to the node.\n")
+	print("\tSort item: \n"
+	"\t\tChoose a sort-by option and the entire list will be sorted alphabetically by said option.\n")
+	print("\tQuick list: \n"
+	"\t\tPrints to screen a simple list of item names only.\n")
+	print("\tPrint formatted list: \n"
+	"\t\tPrints to screen a formatted, sorted and numbered list with all of the data of each node.\n")
+	print("\tExport to CSV/Excel format: \n")
+	print("\t\tExports entire inventory list to a CSV / Excel spreadsheet format for saving or printing to hardcopy.\n")
+	main_menu()
