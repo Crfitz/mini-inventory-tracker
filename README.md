@@ -1,4 +1,5 @@
 
+Screenshot_20220702-212026_Pydroid 3.jpg
 
 # mini-inventory-tracker
 Just a small inventory program. I'm very new to python and thought this would be a fun little project.  My inspiration for this started with "where the hell did I put that thing?" Lol. But this could be used for many inventory and location-tracking purposes. Or "I put that thing somewhere so the kids couldn't mess with it and now i can't remember where I put it..."-type purposes.
