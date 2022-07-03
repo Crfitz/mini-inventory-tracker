@@ -1,10 +1,8 @@
-# main program
-# 06.13.2022
 import inventory_functions as funcs
 import database_module as db
 
 database = 'inventory_db.json'
-version = '1.32'
+version = '1.3.2'
 
 data = ' '
 item = ' '
