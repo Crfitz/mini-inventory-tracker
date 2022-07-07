@@ -33,3 +33,5 @@ As mentioned above, the inventory data resides in a json file; if no file found,
 
 ## Author
 Crfitz
+
+Also, a big thanks to shivang-b for contributing to the readme.md.  A great improvement! 
